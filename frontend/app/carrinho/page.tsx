@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/ui/header";
+import { useCart } from "@/contexts/cart-context";
 import {
     Trash2,
     Minus,
@@ -12,9 +13,34 @@ import {
     ArrowRight,
     Lock,
     ChevronRight,
+    ShoppingBag,
 } from "lucide-react";
 
 export default function CartPage() {
+    const { items, removeItem, updateQuantity, subtotal, totalItems } = useCart();
+
+    if (items.length === 0) {
+        return (
+            <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col">
+                <Header />
+                <main className="flex-grow flex flex-col items-center justify-center p-8 text-center text-slate-500">
+                    <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                        <ShoppingBag className="w-12 h-12 text-slate-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Seu carrinho está vazio</h2>
+                    <p className="mb-8 max-w-md mx-auto">Parece que você ainda não adicionou nenhum produto ao carrinho. Explore nossa vitrine e encontre as melhores ofertas para você!</p>
+                    <Link
+                        href="/"
+                        className="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary-dark transition-colors inline-flex items-center gap-2"
+                    >
+                        <ArrowLeft className="size-5" />
+                        Voltar para a Loja
+                    </Link>
+                </main>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col">
             <Header />
@@ -23,10 +49,6 @@ export default function CartPage() {
                 <nav className="flex items-center text-sm font-medium text-slate-500 mb-8 gap-2">
                     <Link href="/" className="hover:text-primary transition-colors">
                         Home
-                    </Link>
-                    <ChevronRight className="size-4" />
-                    <Link href="#" className="hover:text-primary transition-colors">
-                        Produtos
                     </Link>
                     <ChevronRight className="size-4" />
                     <span className="text-slate-900 dark:text-white font-semibold">
@@ -46,122 +68,76 @@ export default function CartPage() {
                             <div className="col-span-2 text-center">Quantidade</div>
                             <div className="col-span-2 text-right">Subtotal</div>
                         </div>
-                        {/* Cart Item 1 */}
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 md:border-none md:shadow-none md:bg-transparent md:dark:bg-transparent md:p-0">
-                            <div className="md:grid md:grid-cols-12 md:gap-4 md:items-center py-4 border-b border-slate-200 dark:border-slate-700 last:border-0">
-                                {/* Product Info */}
-                                <div className="col-span-6 flex gap-4 items-start md:items-center mb-4 md:mb-0">
-                                    <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 dark:border-slate-600">
-                                        <img
-                                            alt="Kit de sabonetes artesanais com embalagem rústica"
-                                            className="w-full h-full object-cover"
-                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAARZn79l3KpJwxtFjAykybrh7gV3a85vG8RI1OR5ivijfRLGpQcxjtoUCusyZc_IFQaz1rrQhNBY5FpXx8A-b2FIS1FJa1YoyrBVSYPKQaLvJmIe3ttWoVAGO3vcw6NhIWo1phByb5CyTjYVDucJsRbrCM9TEmtgldvHpRJi5gktWWbX-loU-Wcv_zlmHUm_k341VvnzuToYvcLPWJ4RCcmRoCnfKoF-SJhDxjK5TMeU3itggZNqDAmriZX5ABiayyQC0qTf_YJQ"
-                                        />
+
+                        {items.map((item) => (
+                            <div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 md:border-none md:shadow-none md:bg-transparent md:dark:bg-transparent md:p-0">
+                                <div className="md:grid md:grid-cols-12 md:gap-4 md:items-center py-4 border-b border-slate-200 dark:border-slate-700 last:border-0">
+                                    {/* Product Info */}
+                                    <div className="col-span-6 flex gap-4 items-start md:items-center mb-4 md:mb-0">
+                                        <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 dark:border-slate-600">
+                                            <img
+                                                alt={item.name}
+                                                className="w-full h-full object-cover"
+                                                src={item.image}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-base md:text-lg line-clamp-2">
+                                                {item.name}
+                                            </h3>
+                                            <button
+                                                onClick={() => removeItem(item.id)}
+                                                className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1 transition-colors w-fit"
+                                            >
+                                                <Trash2 className="size-[14px]" />
+                                                Remover
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col gap-1">
-                                        <h3 className="font-bold text-slate-900 dark:text-white text-base md:text-lg">
-                                            Kit Sabonetes Artesanais
-                                        </h3>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            Aroma: Lavanda & Mel
-                                        </p>
-                                        <button className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1 transition-colors w-fit">
-                                            <Trash2 className="size-[14px]" />
-                                            Remover
-                                        </button>
+                                    {/* Price */}
+                                    <div className="col-span-2 text-center hidden md:block text-slate-600 dark:text-slate-300 font-medium">
+                                        R$ {item.price.toFixed(2).replace(".", ",")}
                                     </div>
-                                </div>
-                                {/* Price (Mobile: Hidden label, displayed inline) */}
-                                <div className="col-span-2 text-center hidden md:block text-slate-600 dark:text-slate-300 font-medium">
-                                    R$ 45,00
-                                </div>
-                                {/* Quantity Control */}
-                                <div className="col-span-2 flex items-center justify-between md:justify-center">
-                                    <span className="md:hidden text-sm font-medium text-slate-500">
-                                        Quantidade:
-                                    </span>
-                                    <div className="flex items-center border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden h-9 bg-white dark:bg-slate-900">
-                                        <button className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center">
-                                            <Minus className="size-4" />
-                                        </button>
-                                        <input
-                                            className="w-10 text-center text-sm font-semibold text-slate-900 dark:text-white border-none focus:ring-0 p-0 bg-transparent h-full"
-                                            readOnly
-                                            type="text"
-                                            value="1"
-                                        />
-                                        <button className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center">
-                                            <Plus className="size-4" />
-                                        </button>
+                                    {/* Quantity Control */}
+                                    <div className="col-span-2 flex items-center justify-between md:justify-center">
+                                        <span className="md:hidden text-sm font-medium text-slate-500">
+                                            Quantidade:
+                                        </span>
+                                        <div className="flex items-center border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden h-9 bg-white dark:bg-slate-900">
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center"
+                                                disabled={item.quantity <= 1}
+                                            >
+                                                <Minus className="size-4" />
+                                            </button>
+                                            <input
+                                                className="w-10 text-center text-sm font-semibold text-slate-900 dark:text-white border-none focus:ring-0 p-0 bg-transparent h-full"
+                                                readOnly
+                                                type="text"
+                                                value={item.quantity}
+                                            />
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center"
+                                            >
+                                                <Plus className="size-4" />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                {/* Subtotal */}
-                                <div className="col-span-2 flex items-center justify-between md:justify-end mt-4 md:mt-0 pt-4 md:pt-0 border-t border-slate-100 dark:border-slate-700 md:border-t-0">
-                                    <span className="md:hidden text-sm font-medium text-slate-500">
-                                        Total:
-                                    </span>
-                                    <span className="font-bold text-slate-900 dark:text-white text-lg">
-                                        R$ 45,00
-                                    </span>
+                                    {/* Subtotal */}
+                                    <div className="col-span-2 flex items-center justify-between md:justify-end mt-4 md:mt-0 pt-4 md:pt-0 border-t border-slate-100 dark:border-slate-700 md:border-t-0">
+                                        <span className="md:hidden text-sm font-medium text-slate-500">
+                                            Total:
+                                        </span>
+                                        <span className="font-bold text-slate-900 dark:text-white text-lg">
+                                            R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {/* Cart Item 2 */}
-                        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 md:border-none md:shadow-none md:bg-transparent md:dark:bg-transparent md:p-0">
-                            <div className="md:grid md:grid-cols-12 md:gap-4 md:items-center py-4 border-b border-slate-200 dark:border-slate-700 last:border-0">
-                                <div className="col-span-6 flex gap-4 items-start md:items-center mb-4 md:mb-0">
-                                    <div className="relative w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 dark:border-slate-600">
-                                        <img
-                                            alt="Vela aromática em pote de vidro com pavio de madeira"
-                                            className="w-full h-full object-cover"
-                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAo889ytHFa4OHtFHTa6Q1FCwTZ5zg1czC5_KEcJYM4XHAE608jBBk9RVKiCuvUkfHtNNwwskU1DkdKt4LuowWnWthjGETA-Vn9A-QNc7wvNGjsXS1HRb31hwu9HUosbtjHUTl8Q2V6XP3vUiQsNEwKP0ell2bJWuFCik26CPktiky57gEvUysIWJ0sIrWs48YTdEbVEpddDx77jccCkoGnItsHS6GoGcWlzxS2U7TgI-iz75AdY0Jd7fd61g7plJcIYFF8gBqCg"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <h3 className="font-bold text-slate-900 dark:text-white text-base md:text-lg">
-                                            Vela Aromática
-                                        </h3>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            Fragrância: Baunilha
-                                        </p>
-                                        <button className="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1 mt-1 transition-colors w-fit">
-                                            <Trash2 className="size-[14px]" />
-                                            Remover
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-span-2 text-center hidden md:block text-slate-600 dark:text-slate-300 font-medium">
-                                    R$ 30,00
-                                </div>
-                                <div className="col-span-2 flex items-center justify-between md:justify-center">
-                                    <span className="md:hidden text-sm font-medium text-slate-500">
-                                        Quantidade:
-                                    </span>
-                                    <div className="flex items-center border border-slate-300 dark:border-slate-600 rounded-lg overflow-hidden h-9 bg-white dark:bg-slate-900">
-                                        <button className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center">
-                                            <Minus className="size-4" />
-                                        </button>
-                                        <input
-                                            className="w-10 text-center text-sm font-semibold text-slate-900 dark:text-white border-none focus:ring-0 p-0 bg-transparent h-full"
-                                            readOnly
-                                            type="text"
-                                            value="2"
-                                        />
-                                        <button className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors h-full flex items-center">
-                                            <Plus className="size-4" />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-span-2 flex items-center justify-between md:justify-end mt-4 md:mt-0 pt-4 md:pt-0 border-t border-slate-100 dark:border-slate-700 md:border-t-0">
-                                    <span className="md:hidden text-sm font-medium text-slate-500">
-                                        Total:
-                                    </span>
-                                    <span className="font-bold text-slate-900 dark:text-white text-lg">
-                                        R$ 60,00
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
+
                         <div className="flex justify-start pt-4">
                             <Link
                                 href="/"
@@ -180,8 +156,8 @@ export default function CartPage() {
                             </h2>
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                                    <span>Subtotal (3 itens)</span>
-                                    <span className="font-medium">R$ 105,00</span>
+                                    <span>Subtotal ({totalItems} itens)</span>
+                                    <span className="font-medium">R$ {subtotal.toFixed(2).replace(".", ",")}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                                     <span>Frete Estimado</span>
@@ -192,7 +168,7 @@ export default function CartPage() {
                                 <div className="h-px bg-slate-200 dark:bg-slate-700 my-4"></div>
                                 <div className="flex justify-between items-center text-slate-900 dark:text-white text-lg font-bold">
                                     <span>Total</span>
-                                    <span className="text-2xl">R$ 105,00</span>
+                                    <span className="text-2xl">R$ {subtotal.toFixed(2).replace(".", ",")}</span>
                                 </div>
                             </div>
                             {/* Important Disclaimer */}

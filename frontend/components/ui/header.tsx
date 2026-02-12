@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { Store, Search, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
 
 export function Header() {
+    const { totalItems } = useCart();
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-slate-800 dark:bg-background-dark/95">
             <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
@@ -41,9 +44,11 @@ export function Header() {
                         className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
                     >
                         <ShoppingCart className="size-6" />
-                        <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-background-dark">
-                            2
-                        </span>
+                        {totalItems > 0 && (
+                            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-background-dark">
+                                {totalItems}
+                            </span>
+                        )}
                     </Link>
                     <div className="hidden sm:block w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
                     <Link
